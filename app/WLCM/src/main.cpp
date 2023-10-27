@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <DNSServer.h>
+
 #ifdef ESP32
 #include <WiFi.h>
 #include <AsyncTCP.h>
@@ -7,9 +8,10 @@
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
 #endif
+
+#include <statusblink.h>
 #include "ESPAsyncWebServer.h"
 #include "web/webcaptiverequesthandler.h"
-#include "utils/statusblink.h"
 
 DNSServer dnsServer;
 AsyncWebServer server(80);
@@ -40,5 +42,5 @@ void setup(){
 void loop(){
   dnsServer.processNextRequest();
   // resetHandler.processRequests();
-  statusBlink.update(false);
+  statusBlink.loopUpdate();
 }

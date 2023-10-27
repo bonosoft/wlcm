@@ -1,51 +1,49 @@
 /*
  Blink class - non-blocking.
-
 */
 
 
 #include "statusblink.h"
 
-// allocate the requested buffer size
 void StatusBlink::setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 } 
 
 void StatusBlink::blink() {
-  interval += 500;
-  multiBlink = 1;
+  onMiliseconds += activityMillis;
+  multiBlink = Normal;
 }
 
-void StatusBlink::update(bool isLEDportInUse) {
+void StatusBlink::loopUpdate() {
   unsigned long currentMillis = millis();
   if (ledState == LOW) {
-    if (interval > 0) {
+    if (onMiliseconds > 0) {
       previousMillis = currentMillis;
       ledState = HIGH;
       if (!isLEDportInUse) digitalWrite(LED_BUILTIN, ledState);
     } else {
       if (multiBlink>1) {
-        if (currentMillis - previousMillis >= 200) {
+        if (currentMillis - previousMillis >= blinkLengthMillis) {
          previousMillis = currentMillis;
          ledState = HIGH;
-         interval=200;
+         onMiliseconds=blinkLengthMillis;
          if (!isLEDportInUse) digitalWrite(LED_BUILTIN, ledState);
          multiBlink--;
         }
       }
-      if (currentMillis - previousMillis >= timeout) {
+      if (currentMillis - previousMillis >= timeoutMiliseconds) {
          previousMillis = currentMillis;
          ledState = HIGH;
-         interval=200;
+         onMiliseconds=blinkLengthMillis;
          if (!isLEDportInUse) digitalWrite(LED_BUILTIN, ledState);
-         if (timeoutType>1) multiBlink = timeoutType;
+         if (statusMultiBlinks>1) multiBlink = statusMultiBlinks;
       }
     }
   } else {
-    if (currentMillis - previousMillis >= interval) {
+    if (currentMillis - previousMillis >= onMiliseconds) {
       previousMillis = currentMillis;
       ledState = LOW;
-      interval=0;
+      onMiliseconds=0;
       if (!isLEDportInUse) digitalWrite(LED_BUILTIN, ledState);
     }
   }
