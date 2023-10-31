@@ -9,37 +9,45 @@
 #include <ESPAsyncTCP.h>
 #endif
 
-#include <statusblink.h>
 #include "ESPAsyncWebServer.h"
+
+#include <statusblink.h>
+#include "config/configmenu.h"
 #include "web/webcaptiverequesthandler.h"
+#include "web/webapp.h"
+#include "web/styles.h"
 
 DNSServer dnsServer;
-AsyncWebServer server(80);
-StatusBlink statusBlink; 
-
+AsyncWebServer webServer(80);
+ConfigMenu configMenu;
+StatusBlink statusBlink;
 // ResetHandler resetHandler;
 
 
-void setup(){
-  Serial.begin(115200);
-  delay(500);
-  Serial.print("WLCM Node version 1.0 on ID-" + (String)ESP.getChipId());
+void setup() {
+  statusBlink.setup();                   // Set the status blink class to init state (3x blinks)
+  statusBlink.inverse();
+  configMenu.setup();
+  
 
   // Connect to Wi-Fi
 
   // if Wi-Fi connection failed, start AP
   WiFi.softAP("WLCM Node " + (String)ESP.getChipId());
   dnsServer.start(53, "*", WiFi.softAPIP());
-  server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);//only when requested from AP
+  webServer.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);//only when requested from AP
+  
+  webServer.on("/", HTTP_ANY, handleHtmlRequest);
+  webServer.on("/styles.css", HTTP_GET, handleStylesRequest);
 
   // more web handlers...
  
-  server.begin();
-  statusBlink.setup();                   // Set the status blink class to init state (3x blinks)
+  webServer.begin();
 
 }
 
-void loop(){
+void loop() {
+  configMenu.loopMenu();
   dnsServer.processNextRequest();
   // resetHandler.processRequests();
   statusBlink.loopUpdate();

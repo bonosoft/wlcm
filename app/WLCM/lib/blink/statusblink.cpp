@@ -16,16 +16,16 @@ void StatusBlink::blink() {
 
 void StatusBlink::loopUpdate() {
   unsigned long currentMillis = millis();
-  if (ledState == LOW) {
+  if (ledState == LED_OFF) {
     if (onMiliseconds > 0) {
       previousMillis = currentMillis;
-      ledState = HIGH;
+      ledState = LED_ON;
       if (!isLEDportInUse) digitalWrite(LED_BUILTIN, ledState);
     } else {
       if (multiBlink>1) {
         if (currentMillis - previousMillis >= blinkLengthMillis) {
          previousMillis = currentMillis;
-         ledState = HIGH;
+         ledState = LED_ON;
          onMiliseconds=blinkLengthMillis;
          if (!isLEDportInUse) digitalWrite(LED_BUILTIN, ledState);
          multiBlink--;
@@ -33,7 +33,7 @@ void StatusBlink::loopUpdate() {
       }
       if (currentMillis - previousMillis >= timeoutMiliseconds) {
          previousMillis = currentMillis;
-         ledState = HIGH;
+         ledState = LED_ON;
          onMiliseconds=blinkLengthMillis;
          if (!isLEDportInUse) digitalWrite(LED_BUILTIN, ledState);
          if (statusMultiBlinks>1) multiBlink = statusMultiBlinks;
@@ -42,7 +42,7 @@ void StatusBlink::loopUpdate() {
   } else {
     if (currentMillis - previousMillis >= onMiliseconds) {
       previousMillis = currentMillis;
-      ledState = LOW;
+      ledState = LED_OFF;
       onMiliseconds=0;
       if (!isLEDportInUse) digitalWrite(LED_BUILTIN, ledState);
     }
