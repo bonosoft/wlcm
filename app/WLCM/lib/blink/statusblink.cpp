@@ -5,8 +5,11 @@
 
 #include "statusblink.h"
 
-void StatusBlink::setup() {
+StatusBlink statusBlink;
+
+StatusBlink& StatusBlink::setup() {
   pinMode(LED_BUILTIN, OUTPUT);
+  return *this;
 } 
 
 void StatusBlink::blink() {
@@ -14,7 +17,7 @@ void StatusBlink::blink() {
   multiBlink = Normal;
 }
 
-void StatusBlink::loopUpdate() {
+void StatusBlink::loop() {
   unsigned long currentMillis = millis();
   if (ledState == LED_OFF) {
     if (onMiliseconds > 0) {

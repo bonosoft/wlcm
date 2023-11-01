@@ -24,7 +24,7 @@ enum Menu {
 
 class ConfigMenu {
 
-    Menu menu = Menu::ShowMainMenu;
+    Menu menu = Menu::None;
 
     int commandIndex = 0;
     char command[32] = "";
@@ -44,11 +44,17 @@ public:
     void setup() {
         Serial.begin(115200);      // Setup USB Serial connection for debug/status logging
         delay(500);
-        Serial.println("\n---\n\nWLCM Node version " + (String)VERSION + " on ID-" + (String)ESP.getChipId());
+        Serial.println("\n\n-------------------------------------");
+        Serial.println("  WLCM Node ver " + (String)VERSION + "   ID-" + (String)ESP.getChipId());
+        Serial.println("-------------------------------------");
+        config.init();
+        Serial.println("-------------------------------------");
     }
 
-    void loopMenu();
+    void loop();
 
 };
+
+extern ConfigMenu configMenu;
 
 #endif

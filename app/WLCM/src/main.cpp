@@ -1,42 +1,26 @@
 #include <Arduino.h>
-#include <DNSServer.h>
-
-#ifdef ESP32
-#include <WiFi.h>
-#include <AsyncTCP.h>
-#elif defined(ESP8266)
-#include <ESP8266WiFi.h>
-#include <ESPAsyncTCP.h>
-#endif
 
 #include "ESPAsyncWebServer.h"
 
 #include <statusblink.h>
+
 #include "config/configmenu.h"
+#include "config/configweb.h"
+
 #include "web/webcaptiverequesthandler.h"
 #include "web/webapp.h"
 #include "web/styles.h"
 
-DNSServer dnsServer;
 AsyncWebServer webServer(80);
-ConfigMenu configMenu;
-StatusBlink statusBlink;
-// ResetHandler resetHandler;
 
 
 void setup() {
-  statusBlink.setup();                   // Set the status blink class to init state (3x blinks)
-  statusBlink.inverse();
+  statusBlink.setup().inverse();                   // Set the status blink class to init state (3x blinks)
   configMenu.setup();
-  
+  configWeb.setup();
+ 
+  webServer.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);  //only when requested from AP
 
-  // Connect to Wi-Fi
-
-  // if Wi-Fi connection failed, start AP
-  WiFi.softAP("WLCM Node " + (String)ESP.getChipId());
-  dnsServer.start(53, "*", WiFi.softAPIP());
-  webServer.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);//only when requested from AP
-  
   webServer.on("/", HTTP_ANY, handleHtmlRequest);
   webServer.on("/styles.css", HTTP_GET, handleStylesRequest);
 
@@ -47,8 +31,7 @@ void setup() {
 }
 
 void loop() {
-  configMenu.loopMenu();
-  dnsServer.processNextRequest();
-  // resetHandler.processRequests();
-  statusBlink.loopUpdate();
+  configWeb.loop();
+  configMenu.loop();
+  statusBlink.loop();
 }

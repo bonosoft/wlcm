@@ -3,7 +3,14 @@
 #include "config.h"
 
 #include <Arduino.h>
+
+#ifdef ESP32
+#include <WiFi.h>
+#elif defined(ESP8266)
 #include <ESP8266WiFi.h>
+#endif
+
+ConfigMenu configMenu;
 
 void ConfigMenu::insert(char ch) {
     command[commandIndex] = ch;
@@ -140,7 +147,9 @@ void ConfigMenu::handleInput() {
                 menu = Menu::ShowFactoryReset;
             } else if (strcmp("q", command) == 0 || strcmp("Q", command) == 0) {
                 menu = Menu::None;
+                Serial.println("\n--------------");
                 config.startLogging();
+                config.log("");
             } else {
                 menu = Menu::ShowMainMenu;
             }
@@ -159,8 +168,8 @@ void ConfigMenu::showMenu() {
         switch (menu) {
         case Menu::ShowMainMenu:
             config.stopLogging();
-            Serial.println("\n---\n\nWLCM Node version " + (String)VERSION + " on ID-" + (String)ESP.getChipId());
-            Serial.println("\n   WLCM Main Administration Menu");
+            Serial.println("\n---\n\nWLCM Node version " + (String)VERSION + "   ID-" + (String)ESP.getChipId());
+            Serial.println("\n Main Administration Menu");
             Serial.println(" 1 Find me");
             Serial.println(" 2 Search for Wi-Fi");
             Serial.println(" 3 Set Web Admin Password");
@@ -247,7 +256,7 @@ void ConfigMenu::showMenu() {
 }
 
 
-void ConfigMenu::loopMenu() {
+void ConfigMenu::loop() {
     if (Serial.available()) {
         char ch = Serial.read();
         if (ch=='\n') {

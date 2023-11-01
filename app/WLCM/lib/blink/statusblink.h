@@ -39,12 +39,12 @@ class StatusBlink {
     ~StatusBlink() { }
 
     // handle initialization of the pin
-    void setup();
+    StatusBlink& setup();
 
     void blink();
 
     // handle incoming data, return true if packet ready
-    void loopUpdate();
+    void loop();
 
     void setStatus(AppStatus appStatus) {
       statusMultiBlinks = appStatus;
